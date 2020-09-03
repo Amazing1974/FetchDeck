@@ -1,0 +1,1 @@
+export const HOST = 'https://us-central1-fetchdeck-6c43c.cloudfunctions.net';
