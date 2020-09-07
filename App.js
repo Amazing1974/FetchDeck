@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import 'react-native-gesture-handler';
+import store from './store';
 import FetchDeckApp from './components/FetchDeckApp';
+import 'react-native-gesture-handler';
 
 export default class App extends Component {
   render() {
     return (
-      <FetchDeckApp />
+      <FetchDeckApp store={store} />
     )
   }
 }

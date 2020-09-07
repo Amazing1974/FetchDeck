@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
 import {
   View,
   Text,
@@ -10,46 +11,54 @@ import ProgressBar from '../components/ProgressBar';
 import { Spinner } from 'native-base';
 import { Palette, GlobalStyles } from '../styles';
 
-const ProductCard = ({product, navigation}) => {
+const ProductCard = (props) => {
 
   const [isLoading, setLoading] = useState(false);
-  const [randomBuyers, setRandomBuyers] = useState();
-  const [buyer, setBuyer] = useState();
+  const [buyer, setBuyer] = useState('');
   const [myName, setMyName] = useState('Jal');
   const [isSold, setSold] = useState(false);
+  const [product, setProduct] = useState();
+
   const progressBarRef = useRef();
+  const randomBidders = props.randomBidders;
+
+  const image = product && product.product.images[0].src;
+  const current_bid = product && product.bid.current_bid;
+  const seller_name = product && product.bid.seller_name;
+  const ranNum = Math.random() * 10000 % 100;
+  const price = product && product.product.variants[0].price;
 
   useEffect(() => {
-    fetchBuyer();
+    fetchProduct(props.uid);
   }, []);
 
-  const fetchBuyer = () => {
-    let buyers = [];
-    firestore().collection('RandomUser').get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(snapshot => {
-        buyers.push(snapshot.data().name);
-      })
-      setRandomBuyers(buyers);
+  const fetchProduct = (uid) => {
+    firestore()
+    .collection('Products')
+    .doc(uid)
+    .onSnapshot(documentSnapshot => {
+      const Data = documentSnapshot.data();
+      setBuyer(Data.bid.winning_name);
+      setProduct({...product, ...Data});
+      console.log('111');
+      !isSold && progressBarRef.current.resetProgressBar();
+      console.log('222');
     })
-    .catch(error => {
-      console.log(error);
-    })
+
   }
 
   const onBid = async(auto) => {
     setLoading(true);
+
+    const current_buyer = onChangeBuyer(auto);
     let updatedBid = product.bid;
     updatedBid.current_bid = product.bid.current_bid + 1;
-    updatedBid.winning_name = buyer;
-    console.log(buyer);
+    updatedBid.winning_name = current_buyer;
+    console.log("winner", updatedBid.winning_name);
 
-    await firestore().collection('Products').doc(product.uid).update({ bid: updatedBid })
+    await firestore().collection('Products').doc(props.uid).update({ bid: updatedBid })
     .then(() => {
-      progressBarRef.current.resetProgressBar();
-      if(!auto) {
-        setBuyer(myName);
-      }
+      setBuyer(current_buyer);
     })
     .catch(error => {
       console.log(error);
@@ -58,34 +67,56 @@ const ProductCard = ({product, navigation}) => {
     setLoading(false);
   }
   
-  const onChangeBuyer = () => {
-    console.log('===========onChangeBuyer');
-    if(randomBuyers) {
-      let temp = randomBuyers;
-      temp = temp.sort(() => Math.random() - 0.5); // sort product random
-      setBuyer(temp[0]);
+  const onChangeBuyer = (auto) => {
+    if(!auto) {
+      return myName;
+    } else {
+      if(randomBidders) {
+        let temp = randomBidders;
+        temp = temp.sort(() => Math.random() - 0.5); // sort product random
+        return temp[0];
+      }
     }
   }
 
   const onSold = () => {
-    console.log(buyer);
+    console.log('======Sold product by', buyer);
     setSold(true);
+    let temp = props.productsUID;
+    temp = temp.sort(() => Math.random() - 0.5); // sort product random
+    console.log(temp[0]);
+
+    const bid = {
+      current_bid: 0,
+      winning_name: '',
+      seller_name: seller_name,
+    }
+    // fetchProduct(props.uid);
+    // firestore()
+    // .collection('Products')
+    // .doc(props.uid)
+    // .update({ bid: bid })
+    // fetchProduct(temp[0]);
   }
 
-  const image = product && product.product.images[0].src;
-  const current_bid = product && product.bid.current_bid;
-  const seller_name = product && product.bid.seller_name;
-  const ranNum = Math.random() * 10000 % 300;
   return (
     <View style={styles.cateContainer}>
       <View style={styles.splitBar} />
       <View style={{flexDirection: 'row'}}>
-        {/** Left Panel */}
+
+        {/** Image Panel */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('ProductDetail', { product: product.product, sellerName: seller_name })}
-          style={styles.leftPan}>
+          style={styles.leftPan}
+          onPress={() => props.navigation.navigate(
+            'ProductDetail',
+            {
+              product: product.product,
+              sellerName: seller_name
+            })}
+        >
           <Image source={image && {uri: image}} style={{flex: 1}} />
         </TouchableOpacity>
+
         {/** Right Panel */}
         <View style={{flex: 1, marginLeft: 4}}>
           {
@@ -131,11 +162,10 @@ const ProductCard = ({product, navigation}) => {
               <View style={styles.progressContainer}>
                 <ProgressBar
                   ref={progressBarRef}
-                  price={product.product.variants[0].price}
+                  price={price}
                   current_bid={current_bid}
                   onBid={() => onBid(true)}
-                  reserve={ranNum < 200 ? ranNum < 100 ? ranNum + 150 : ranNum + 50 : ranNum}
-                  onChangeBuyer={() => onChangeBuyer()}
+                  reserve={ranNum}
                   onSold={() => onSold()}
                 />
               </View>
@@ -147,7 +177,7 @@ const ProductCard = ({product, navigation}) => {
             ) : null
           }
           {
-            !isSold && buyer && (
+            !isSold && buyer !== '' && (
               <View style={{flexDirection: 'row'}}>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarTitle}>{buyer.slice(0, 1)}</Text>
@@ -161,12 +191,17 @@ const ProductCard = ({product, navigation}) => {
           }
         </View>
       </View>
-      <Text style={{...GlobalStyles.darkLabel, marginVertical: 10}}>{'1 BID'}</Text>
+      <Text style={{...GlobalStyles.darkLabel, marginVertical: 10}}>{}</Text>
     </View>
   )
 }
 
-export default ProductCard;
+const mapStateToProps = state => ({
+  randomBidders: state.products.randomBidders,
+  productsUID: state.products.productsUID,
+});
+
+export default connect(mapStateToProps)(ProductCard);
 
 const styles = {  
   cateContainer: {

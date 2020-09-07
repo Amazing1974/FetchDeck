@@ -1,45 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import {
   View,
   Text,
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  FlatList,
   Image,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/EvilIcons';
-import firestore from '@react-native-firebase/firestore';
-import ProductCard from '../components/ProductCard';
 import { Palette, GlobalStyles } from '../styles';
-import { HOST } from '../constants';
+import { fetchProducts } from '../actions';
+import Icon from 'react-native-vector-icons/EvilIcons';
+import ProductCard from '../components/ProductCard';
 
-const CATGEGORY = ['ALL', 'FREE SHIPPING', 'HOME & HOMBBIES', 'ELECTRONIC', 'FASHION & BEAUTY', 'JEWELRY'];
+const MainScreen = (props) => {
 
-// axios.defaults.baseURL = HOST;
-// axios.defaults.headers.post['Content-Type'] = 'application/json';
-// axios.defaults.headers.common['X-Shopify-Access-Token'] = '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';
+  const {navigation, countOfProducts, products} = props;
+  const [mockData, setMockData] = useState(products.slice(0, countOfProducts < 9 ? countOfProducts : 8));
+  const [currentPage, setCurrentPage] = useState(1);
 
-const MainScreen = ({ navigation }) => {
-
-  const [products, setProducts] = useState();
-  
-  function fetchData() {
-    firestore()
-    .collection('Products')
-    .onSnapshot(querySnapshot => {
-      let products = [];
-      querySnapshot.forEach(snapshot => {
-        let temp = snapshot.data()
-        temp.uid = snapshot.id;
-        products.push(temp);
-      });
-      setProducts(products);
-    })
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, []);
+  const CATGEGORY = ['ALL', 'FREE SHIPPING', 'HOME & HOMBBIES', 'ELECTRONIC', 'FASHION & BEAUTY', 'JEWELRY'];
 
   const renderHeaderBar = () => {
     return (
@@ -73,22 +54,39 @@ const MainScreen = ({ navigation }) => {
     )
   }
 
+  const handleLoadMore = () => {
+    if(countOfProducts > currentPage * 8) {
+      setCurrentPage(currentPage + 1);
+      setMockData([...mockData, ...products.slice(currentPage * 8 - 1, 8)]);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {renderHeaderBar()}
       {renderCategory()}
-      <ScrollView>
-        {
-          products && products.map((product) => {
-            return (<ProductCard product={product} key={product.product.id} navigation={navigation} />);
-          })
-        }
-      </ScrollView>
+      <FlatList
+        data={mockData}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item, index}) => {
+          return (<ProductCard uid={item.uid} navigation={navigation} />)
+        }}
+        initialNumToRender={1}   // how many item to display first
+        onEndReachedThreshold={1} // so when you are at 5 pixel from the bottom react run onEndReached function
+        onEndReached={() => {
+          handleLoadMore();
+        }}
+      />
     </SafeAreaView>
   )
 }
 
-export default MainScreen;
+const mapStateToProps = state => ({
+  countOfProducts: state.products.countOfProducts,
+  products: state.products.products,
+});
+
+export default connect(mapStateToProps, { fetchProducts })(MainScreen);
 
 const styles = {
   container: {
