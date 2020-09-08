@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import {
   View,
   Text,
@@ -10,12 +11,17 @@ import { Form, Spinner } from 'native-base';
 import { reduxForm, Field } from 'redux-form';
 import { CommonActions } from '@react-navigation/native';
 import { Palette, GlobalStyles } from '../styles';
+import { fetchProfile } from '../actions';
+import auth from '@react-native-firebase/auth';
 import CustomInput from '../components/CustomInput';
 import Button from '../components/Button';
 
 const { width, height } = Dimensions.get('window');
 
 const LoginScreen = (props) => {
+
+  const [isLoading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   
   const toMain = () => {
     props.navigation.dispatch(
@@ -30,13 +36,33 @@ const LoginScreen = (props) => {
     )
   }
 
-  const onRegister = () => {
-    console.log('asdfasdf');
+  const onLogin = (data) => {
+    setLoading(true);
+    setErrorMessage('');
+    const {email, password} = data;
+    auth()
+    .signInWithEmailAndPassword(email, password)
+    .then(data => {
+      props.fetchProfile(data.user.uid);
+      toMain();
+    })
+    .catch(error => {
+      if (error.code === 'auth/user-not-found') {
+        setErrorMessage('Invalid user!');
+      }
+      if (error.code === 'auth/invalid-email') {
+        setErrorMessage('Invalid Email!');
+      }
+      if (error.code === 'auth/wrong-password') {
+        setErrorMessage('Invalid Password!');
+      }
+      setLoading(false);
+    });
   }
 
   const renderRegisterButton = () => {
-    if (props.isLoading) { 
-      return <Spinner color={Palette.red} />;
+    if (isLoading) { 
+      return <Spinner color={Palette.green} />;
     }
 
     const { handleSubmit } = props;
@@ -45,7 +71,7 @@ const LoginScreen = (props) => {
       <View style={styles.buttonWrapper}>
         <Button
           title={'LOGIN'}
-          onPress={handleSubmit(onRegister)}
+          onPress={handleSubmit(onLogin)}
         />
       </View>
     );
@@ -58,6 +84,7 @@ const LoginScreen = (props) => {
           source={require('../assets/images/splash.jpeg')}
           style={styles.image}
         />
+        <Text style={GlobalStyles.errorMessage}>{errorMessage}</Text>
         <Form style={GlobalStyles.form}>
           <Field
             name="email"
@@ -70,6 +97,7 @@ const LoginScreen = (props) => {
             component={CustomInput}
             floatLabel={'Password'}
             autoCorrect={false}
+            secureTextEntry
           />
           {renderRegisterButton()}
         </Form>
@@ -83,7 +111,7 @@ const LoginForm = reduxForm({
   form: 'loginForm' // a unique identifier for this form
 })(LoginScreen);
 
-export default LoginForm;
+export default connect(null, {fetchProfile})(LoginForm);
 
 const styles = {
   container: {
@@ -99,7 +127,6 @@ const styles = {
     marginTop: -90,
     width: width - 180,
     height: height / 12,
-    marginBottom: 20,
   },
   buttonWrapper: {
     marginTop: 60,

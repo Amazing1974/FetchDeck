@@ -2,6 +2,7 @@ import {
   LOGIN,
   LOGIN_ERROR,
   REGISTER_SUCCESS,
+  PROFILE_UPDATE_ON_INIT
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -11,6 +12,7 @@ const INITIAL_STATE = {
 
 export default function(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case PROFILE_UPDATE_ON_INIT:
     case REGISTER_SUCCESS:
       return {
         ...state,

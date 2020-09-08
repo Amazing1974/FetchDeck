@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import {
   View,
   Text,
@@ -6,9 +7,12 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import { Form, Spinner } from 'native-base';
+import { reduxForm, Field } from 'redux-form';
 import { Palette, GlobalStyles } from '../styles'
+import CustomInput from '../components/CustomInput';
 
-const AccountInfo = ({navigation}) => {
+const AccountInfo = ({navigation, user}) => {
   
   useEffect(() => {
     navigation.setOptions({
@@ -19,11 +23,27 @@ const AccountInfo = ({navigation}) => {
         </TouchableOpacity>
       ),
     });
+
+    console.log('====user', user);
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.inputContainer}>
+      <Form style={GlobalStyles.form}>
+        <Field
+          name="name"
+          component={CustomInput}
+          floatLabel={'Name'}
+          autoCorrect={false}
+        />
+        <Field
+          name="email"
+          component={CustomInput}
+          floatLabel={'email'}
+          autoCorrect={false}
+        />
+      </Form>
+      {/* <View style={styles.inputContainer}>
         <Text style={styles.label}>Name</Text>
         <TextInput style={styles.input} />
       </View>
@@ -51,12 +71,21 @@ const AccountInfo = ({navigation}) => {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Time Zone</Text>
         <TextInput style={styles.input} />
-      </View>
+      </View> */}
     </SafeAreaView>
   )
 }
 
-export default AccountInfo;
+const mapStateProps = state => ({
+  user: state.auth.user
+})
+
+// Decorate with reduxForm(). It will read the initialValues prop provided by connect()
+const AccountInfoForm = reduxForm({
+  form: 'accountInfoForm' // a unique identifier for this form
+})(AccountInfo);
+
+export default connect(mapStateProps)(AccountInfoForm);
 
 const styles = {
   container: {
@@ -86,7 +115,7 @@ const styles = {
   },
   saveBtn: {
     ...GlobalStyles.label,
-    color: Palette.purple,
+    color: Palette.green,
     fontSize: 16,
     marginRight: 20,
   },

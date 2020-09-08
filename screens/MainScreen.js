@@ -8,11 +8,14 @@ import {
   ScrollView,
   FlatList,
   Image,
+  Dimensions
 } from 'react-native';
 import { Palette, GlobalStyles } from '../styles';
 import { fetchProducts } from '../actions';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import ProductCard from '../components/ProductCard';
+
+const { width, height } = Dimensions.get('window');
 
 const MainScreen = (props) => {
 
@@ -28,10 +31,10 @@ const MainScreen = (props) => {
         <TouchableOpacity onPress={() => navigation.openDrawer()}>
           <Icon name="navicon" size={28} color={Palette.dark}/>
         </TouchableOpacity>
-        <View style={{flexDirection: 'row', marginLeft: 10}}>
-          <Text style={styles.boldTitle}>FETCH</Text>
-          <Text style={styles.headerTitle}>DECK</Text>
-        </View>
+        <Image
+          source={require('../assets/images/splash.jpeg')}
+          style={styles.image}
+        />
       </View>
     )
   }
@@ -84,6 +87,7 @@ const MainScreen = (props) => {
 const mapStateToProps = state => ({
   countOfProducts: state.products.countOfProducts,
   products: state.products.products,
+  user: state.auth.user,
 });
 
 export default connect(mapStateToProps, { fetchProducts })(MainScreen);
@@ -114,5 +118,10 @@ const styles = {
   },
   cateContainer: {
     paddingHorizontal: 8,
+  },
+  image: {
+    marginTop: 0,
+    width: width - 240,
+    height: height / 12,
   },
 }

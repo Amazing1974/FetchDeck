@@ -51,7 +51,6 @@ const SignupScreen = (props) => {
       </View>
     );
   }
-  console.log('error', props.error);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -96,7 +95,6 @@ const SignupScreen = (props) => {
 }
 
 const mapStateToProps = state => ({
-  user: state.auth.user,
   isLoading: state.auth.isLoading,
   auth: state.auth,
 });

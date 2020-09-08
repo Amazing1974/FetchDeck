@@ -2,12 +2,17 @@ import React from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  View,
+  Dimensions,
   TouchableOpacity,
-  Text
+  Text,
+  Image
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import auth from '@react-native-firebase/auth';
+import { CommonActions } from '@react-navigation/native';
 import { Palette } from '../styles';
+
+const { width, height } = Dimensions.get('window');
 
 const DrawerContent = ({navigation}) => {
 
@@ -24,16 +29,33 @@ const DrawerContent = ({navigation}) => {
         return;
       case 3:
         navigation.navigate('Reminders');
+        return;
+      case 6:
+        auth()
+        .signOut()
+        .then(() => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'Auth',
+                },
+              ],
+            })
+          )
+        })
+        return;
     }
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={{flexDirection: 'row', marginBottom: 20}}>
-          <Text style={styles.boldTitle}>FETCH</Text>
-          <Text style={styles.headerTitle}>DECK</Text>
-        </View>
+        <Image
+          source={require('../assets/images/splash.jpeg')}
+          style={styles.image}
+        />
         <TouchableOpacity
           style={styles.itemWrapper}
           onPress={() => drawerAction(0)}
@@ -79,7 +101,7 @@ const DrawerContent = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.itemWrapper}
-          onPress={() => {}}
+          onPress={() => drawerAction(6)}
         >
           <Icon name="logout" size={18} color={Palette.dark}/>
           <Text style={styles.item}>Sign Out</Text>
@@ -129,5 +151,12 @@ const styles = {
     flexDirection: 'row',
     alignItems:'center',
     marginBottom: 10,
-  }
+  },
+  image: {
+    marginLeft: -16,
+    marginBottom: 20,
+    marginTop: 0,
+    width: width - 240,
+    height: height / 12,
+  },
 }

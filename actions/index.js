@@ -5,18 +5,26 @@ import {
   LOGIN,
   LOGIN_ERROR,
   REGISTER_SUCCESS,
+  PROFILE_UPDATE_ON_INIT,
   FETCH_PRODUCTS,
   FETCH_PRODUCTS_SUCCESS,
   FETCH_RANDOM_BIDDERS,
   FETCH_RANDOM_BIDDERS_SUCCESS,
 } from '../constants';
 
+export const fetchProfile = (props) => async (dispatch) => {
+  const user = await firestore()
+  .collection('Users')
+  .doc(props)
+  .get();
+  dispatch({ type: PROFILE_UPDATE_ON_INIT, payload: {...user.data(), uid: props}})
+}
+
 export const register = (props) => async (dispatch) => {
   const { callback, email, password, confirmPassword, fullName } = props;
   dispatch({ type: LOGIN});
 
   if(_.eq(password, confirmPassword)) {
-    console.log('confirmPas')
     await auth()
     .createUserWithEmailAndPassword(email, password)
     .then(data => {
@@ -42,7 +50,6 @@ export const register = (props) => async (dispatch) => {
       }
     });
   } else {
-    console.log('no confirm');
     dispatch({ type: LOGIN_ERROR, payload: 'The Password Confirmation does not match.' });
   }
 }

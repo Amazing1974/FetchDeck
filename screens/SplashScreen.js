@@ -7,17 +7,24 @@ import {
 } from 'react-native';
 import { Palette } from '../styles';
 import { Spinner } from 'native-base';
-import { fetchRandomBidders } from '../actions';
+import { fetchRandomBidders, fetchProfile } from '../actions';
 import { CommonActions } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 const { width, height } = Dimensions.get('window');
 
 const SplashScreen = (props) => {
 
   useEffect(() => {
+    let authFlag = true;
+    
     props.fetchRandomBidders();
-    !props.isLoadingFetchProducts &&
-    setTimeout(toAuth, 1000);
+    auth().onAuthStateChanged(user => {
+      if(authFlag) {
+        user ? toMain(user.uid) : toAuth()
+        authFlag = false;
+      }
+    })
   }, []);
 
   const toAuth = () => {
@@ -27,6 +34,21 @@ const SplashScreen = (props) => {
         routes: [
           {
             name: 'Auth',
+          },
+        ],
+      })
+    )
+  }
+
+  const toMain = (id) => {
+    props.fetchProfile(id);
+    
+    props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Main',
           },
         ],
       })
@@ -48,11 +70,7 @@ const SplashScreen = (props) => {
   )
 }
 
-const mapStateToProps = state => ({
-  isLoadingFetchProducts: state.products.isLoadingFetchProducts,
-});
-
-export default connect(mapStateToProps, {fetchRandomBidders})(SplashScreen);
+export default connect(null, {fetchRandomBidders, fetchProfile})(SplashScreen);
 
 const styles = {
   container: {
