@@ -1,43 +1,42 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import {
   View,
+  Text,
   SafeAreaView,
   Image,
-  Text,
   Dimensions,
 } from 'react-native';
 import { Form, Spinner } from 'native-base';
 import { reduxForm, Field } from 'redux-form';
 import { CommonActions } from '@react-navigation/native';
 import { Palette, GlobalStyles } from '../styles';
-import { register } from '../actions';
 import CustomInput from '../components/CustomInput';
 import Button from '../components/Button';
 
 const { width, height } = Dimensions.get('window');
 
-const SignupScreen = (props) => {
+const LoginScreen = (props) => {
+  
+  const toMain = () => {
+    props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Main',
+          },
+        ],
+      })
+    )
+  }
 
-  const onRegister = async (data) => {
-    props.register({
-      ...data,
-      callback: () => props.navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            {
-              name: 'Main',
-            },
-          ],
-        })
-      )
-    });
+  const onRegister = () => {
+    console.log('asdfasdf');
   }
 
   const renderRegisterButton = () => {
     if (props.isLoading) { 
-      return <Spinner color={Palette.green} />;
+      return <Spinner color={Palette.red} />;
     }
 
     const { handleSubmit } = props;
@@ -45,29 +44,21 @@ const SignupScreen = (props) => {
     return (
       <View style={styles.buttonWrapper}>
         <Button
-          title={'SIGNUP'}
+          title={'LOGIN'}
           onPress={handleSubmit(onRegister)}
         />
       </View>
     );
   }
-  console.log('error', props.error);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.signupContainer}>
+      <View style={styles.LoginContainer}>
         <Image
           source={require('../assets/images/splash.jpeg')}
           style={styles.image}
         />
-        <Text style={GlobalStyles.errorMessage}>{props.auth.error}</Text>
         <Form style={GlobalStyles.form}>
-          <Field
-            name="fullName"
-            component={CustomInput}
-            floatLabel={'Full Name'}
-            autoCorrect={false}
-          />
           <Field
             name="email"
             component={CustomInput}
@@ -79,14 +70,6 @@ const SignupScreen = (props) => {
             component={CustomInput}
             floatLabel={'Password'}
             autoCorrect={false}
-            secureTextEntry
-          />
-          <Field
-            name="confirmPassword"
-            component={CustomInput}
-            floatLabel={'Confirm Password'}
-            autoCorrect={false}
-            secureTextEntry
           />
           {renderRegisterButton()}
         </Form>
@@ -95,18 +78,12 @@ const SignupScreen = (props) => {
   )
 }
 
-const mapStateToProps = state => ({
-  user: state.auth.user,
-  isLoading: state.auth.isLoading,
-  auth: state.auth,
-});
-
 // Decorate with reduxForm(). It will read the initialValues prop provided by connect()
-const SignUpForm = reduxForm({
-  form: 'signupForm' // a unique identifier for this form
-})(SignupScreen);
+const LoginForm = reduxForm({
+  form: 'loginForm' // a unique identifier for this form
+})(LoginScreen);
 
-export default connect(mapStateToProps, { register })(SignUpForm);
+export default LoginForm;
 
 const styles = {
   container: {
@@ -114,14 +91,15 @@ const styles = {
     justifyContent: 'center',
     backgroundColor: Palette.white,
   },
-  signupContainer: {
+  LoginContainer: {
     padding: 20,
     alignItems: 'center',
   },
   image: {
-    marginTop: -40,
+    marginTop: -90,
     width: width - 180,
     height: height / 12,
+    marginBottom: 20,
   },
   buttonWrapper: {
     marginTop: 60,

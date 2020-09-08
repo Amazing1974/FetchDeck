@@ -8,6 +8,7 @@ import {
 import { Palette } from '../styles';
 import { Spinner } from 'native-base';
 import { fetchRandomBidders } from '../actions';
+import { CommonActions } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,8 +17,21 @@ const SplashScreen = (props) => {
   useEffect(() => {
     props.fetchRandomBidders();
     !props.isLoadingFetchProducts &&
-    setTimeout(() => props.navigation.navigate('Signup'), 1000);
+    setTimeout(toAuth, 1000);
   }, []);
+
+  const toAuth = () => {
+    props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Auth',
+          },
+        ],
+      })
+    )
+  }
   
   return (
     <View style={styles.container}>

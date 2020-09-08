@@ -26,5 +26,13 @@ export const GlobalStyles = {
     fontSize: 14,
     letterSpacing: 0.6,
     color: Palette.dark,
+  },
+  form: {
+    width: '100%'
+  },
+  errorMessage: {
+    fontSize: 14,
+    letterSpacing: 0.3,
+    color: Palette.red,
   }
 }

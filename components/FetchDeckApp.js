@@ -3,8 +3,10 @@ import { Provider, connect } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import AuthScreen from '../screens/AuthScreen';
 import SplashScreen from '../screens/SplashScreen';
 import SignupScreen from '../screens/SignupScreen';
+import LoginScreen from '../screens/LoginScreen';
 import MainScreen from '../screens/MainScreen';
 import Tutorial from '../screens/Tutorial';
 import ProductDetail from '../screens/ProductDetail';
@@ -54,7 +56,9 @@ const FetchDeckApp = (props) => {
           screenOptions={defaultOption}
         >
           <Stack.Screen name="Splash" component={SplashScreen} options={{headerShown: false}} />
-          <Stack.Screen name="Signup" component={SignupScreen} options={{headerShown: false}} />
+          <Stack.Screen name="Auth" component={AuthScreen} options={{headerShown: false}} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Main" component={Main} options={{headerShown: false}} />
           <Stack.Screen name="Tutorial" component={Tutorial} />
           <Stack.Screen name="AccountInfo" component={AccountInfo} />
