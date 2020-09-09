@@ -25,7 +25,7 @@ const ProductCard = (props) => {
   const image = product && product.product.images[0].src;
   const current_bid = product && product.bid.current_bid;
   const seller_name = product && product.bid.seller_name;
-  const ranNum = Math.random() * 10000 % 100;
+  const ranNum = 200 - Math.random() * 10000 % 100;
   const price = product && product.product.variants[0].price;
 
   useEffect(() => {
@@ -40,9 +40,9 @@ const ProductCard = (props) => {
       const Data = documentSnapshot.data();
       setBuyer(Data.bid.winning_name);
       setProduct({...product, ...Data});
-      console.log('111');
+      // console.log('111');
       !isSold && progressBarRef.current.resetProgressBar();
-      console.log('222');
+      // console.log('222');
     })
 
   }
@@ -80,11 +80,11 @@ const ProductCard = (props) => {
   }
 
   const onSold = () => {
-    console.log('======Sold product by', buyer);
+    // console.log('======Sold product by', buyer);
     setSold(true);
     let temp = props.productsUID;
     temp = temp.sort(() => Math.random() - 0.5); // sort product random
-    console.log(temp[0]);
+    // console.log(temp[0]);
 
     const bid = {
       current_bid: 0,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
   View,
@@ -11,7 +11,6 @@ import {
   Dimensions
 } from 'react-native';
 import { Palette, GlobalStyles } from '../styles';
-import { fetchProducts } from '../actions';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import ProductCard from '../components/ProductCard';
 
@@ -19,16 +18,23 @@ const { width, height } = Dimensions.get('window');
 
 const MainScreen = (props) => {
 
-  const {navigation, countOfProducts, products} = props;
-  const [mockData, setMockData] = useState(products.slice(0, countOfProducts < 9 ? countOfProducts : 8));
+  const [mockData, setMockData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [countOfProducts, setCountOfProducts] = useState();
+
+  useEffect(() => {
+    const {countOfProducts, products} = props;
+    setCountOfProducts(countOfProducts);
+    setCurrentPage(1);
+    setMockData(products.slice(0, countOfProducts < 9 ? countOfProducts : 8))
+  }, [props.products])
 
   const CATGEGORY = ['ALL', 'FREE SHIPPING', 'HOME & HOMBBIES', 'ELECTRONIC', 'FASHION & BEAUTY', 'JEWELRY'];
 
   const renderHeaderBar = () => {
     return (
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <TouchableOpacity onPress={() => props.navigation.openDrawer()}>
           <Icon name="navicon" size={28} color={Palette.dark}/>
         </TouchableOpacity>
         <Image
@@ -71,8 +77,9 @@ const MainScreen = (props) => {
       <FlatList
         data={mockData}
         keyExtractor={(item, index) => index.toString()}
+        extraData={props.products}
         renderItem={({item, index}) => {
-          return (<ProductCard uid={item.uid} navigation={navigation} />)
+          return (<ProductCard uid={item.uid} navigation={props.navigation} />)
         }}
         initialNumToRender={1}   // how many item to display first
         onEndReachedThreshold={1} // so when you are at 5 pixel from the bottom react run onEndReached function
@@ -90,7 +97,7 @@ const mapStateToProps = state => ({
   user: state.auth.user,
 });
 
-export default connect(mapStateToProps, { fetchProducts })(MainScreen);
+export default connect(mapStateToProps)(MainScreen);
 
 const styles = {
   container: {

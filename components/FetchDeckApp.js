@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Provider, connect } from 'react-redux';
+import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -14,13 +14,8 @@ import AccountInfo from '../screens/AccountInfo';
 import Reminders from '../screens/Reminders';
 import DrawerContent from './DrawerContent';
 import { Palette } from '../styles';
-import { fetchProducts } from '../actions';
 
 const FetchDeckApp = (props) => {
-
-  useEffect(() => {
-    props.fetchProducts();
-  }, []);
   
   const defaultOption = {
     headerStyle: { 
@@ -70,8 +65,4 @@ const FetchDeckApp = (props) => {
   )
 }
 
-const mapStateToProps = state => ({
-  products: state.products.products,
-});
-
-export default connect(mapStateToProps, { fetchProducts })(FetchDeckApp);
+export default FetchDeckApp;

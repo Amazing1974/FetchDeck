@@ -43,7 +43,7 @@ const ProgressBar = forwardRef((props, ref) => {
   },[progress]);
 
   const width = animation.current.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 200],
     outputRange: ["0%", "100%"],
     extrapolate: "clamp"
   });
@@ -57,7 +57,7 @@ const ProgressBar = forwardRef((props, ref) => {
         props.onBid();
       }
     } else {
-      if(progress < 100) {
+      if(progress < 200) {
         setProgress(progress + 1);
       } else {
         setSold(true);
@@ -67,7 +67,7 @@ const ProgressBar = forwardRef((props, ref) => {
   }, !isSold ? 200 : null);
 
   return (    
-    <Animated.View style={[styles.progress, {width}, progress > 96 ? { borderBottomRightRadius: 4 } : null ]}/>
+    <Animated.View style={[styles.progress, {width}, progress > 196 ? { borderBottomRightRadius: 4 } : null ]}/>
   )
 });
 

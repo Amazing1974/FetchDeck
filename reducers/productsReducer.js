@@ -9,7 +9,7 @@ const INITIAL_STATE = {
   products: [],
   productsUID: [],
   countOfProducts: 0,
-  isLoadingFetchProducts: false,
+  isLoadingFetchProducts: true,
   randomBidders: [],
 };
 
