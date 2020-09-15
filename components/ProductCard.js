@@ -15,7 +15,6 @@ const ProductCard = (props) => {
 
   const [isLoading, setLoading] = useState(false);
   const [buyer, setBuyer] = useState('');
-  const [myName, setMyName] = useState('Jal');
   const [isSold, setSold] = useState(false);
   const [product, setProduct] = useState();
 
@@ -40,9 +39,8 @@ const ProductCard = (props) => {
       const Data = documentSnapshot.data();
       setBuyer(Data.bid.winning_name);
       setProduct({...product, ...Data});
-      // console.log('111');
+      setLoading(false);
       !isSold && progressBarRef.current.resetProgressBar();
-      // console.log('222');
     })
 
   }
@@ -54,22 +52,19 @@ const ProductCard = (props) => {
     let updatedBid = product.bid;
     updatedBid.current_bid = product.bid.current_bid + 1;
     updatedBid.winning_name = current_buyer;
-    console.log("winner", updatedBid.winning_name);
 
-    await firestore().collection('Products').doc(props.uid).update({ bid: updatedBid })
+    firestore().collection('Products').doc(props.uid).update({ bid: updatedBid })
     .then(() => {
       setBuyer(current_buyer);
     })
     .catch(error => {
       console.log(error);
     })
-    
-    setLoading(false);
   }
   
   const onChangeBuyer = (auto) => {
     if(!auto) {
-      return myName;
+      return props && props.user.first_name;
     } else {
       if(randomBidders) {
         let temp = randomBidders;
@@ -90,6 +85,9 @@ const ProductCard = (props) => {
       current_bid: 0,
       winning_name: '',
       seller_name: seller_name,
+    }
+    if(buyer.charAt(0).toUpperCase() === props.user.first_name.charAt(0).toUpperCase()) {
+      alert('SOLD');
     }
     // fetchProduct(props.uid);
     // firestore()
@@ -180,7 +178,7 @@ const ProductCard = (props) => {
             !isSold && buyer !== '' && (
               <View style={{flexDirection: 'row'}}>
                 <View style={styles.avatar}>
-                  <Text style={styles.avatarTitle}>{buyer.slice(0, 1)}</Text>
+                  <Text style={styles.avatarTitle}>{buyer.charAt(0).toUpperCase()}</Text>
                 </View>
                 <View>
                   <Text style={styles.userName}>{buyer}</Text>
@@ -199,6 +197,7 @@ const ProductCard = (props) => {
 const mapStateToProps = state => ({
   randomBidders: state.products.randomBidders,
   productsUID: state.products.productsUID,
+  user: state.auth.user
 });
 
 export default connect(mapStateToProps)(ProductCard);

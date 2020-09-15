@@ -2,6 +2,7 @@ import _ from 'lodash';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {
+  HOST,
   LOGIN,
   LOGIN_ERROR,
   REGISTER_SUCCESS,
@@ -11,6 +12,11 @@ import {
   FETCH_RANDOM_BIDDERS,
   FETCH_RANDOM_BIDDERS_SUCCESS,
 } from '../constants';
+import axios from 'axios';
+
+axios.defaults.baseURL = `${HOST}`;
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.common['X-Shopify-Access-Token'] = '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';
 
 export const fetchProfile = (props) => async (dispatch) => {
   const user = await firestore()
@@ -21,19 +27,26 @@ export const fetchProfile = (props) => async (dispatch) => {
 }
 
 export const register = (props) => async (dispatch) => {
-  const { callback, email, password, confirmPassword, fullName } = props;
+  const { callback, email, password, confirmPassword, firstName, lastName } = props;
   dispatch({ type: LOGIN});
 
   if(_.eq(password, confirmPassword)) {
     await auth()
     .createUserWithEmailAndPassword(email, password)
-    .then(data => {
+    .then(async(data) => {
+      const response = await axios.post('/customers.json', {
+        customer: {
+          email: email,
+          first_name: firstName,
+          last_name: lastName,
+        }
+      });
       firestore()
       .collection('Users')
       .doc(data.user.uid)
-      .set({name: fullName, email: email})
+      .set(response.data.customer)
       .then(() => {
-        dispatch({ type: REGISTER_SUCCESS, payload: {name: fullName, email: email, uid: data.user.uid}});
+        dispatch({ type: REGISTER_SUCCESS, payload: {...response.data.customer, uid: data.user.uid}});
         callback();
       })
       .catch(error => console.log(error));

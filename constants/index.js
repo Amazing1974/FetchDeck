@@ -1,4 +1,4 @@
-export const HOST = 'https://us-central1-fetchdeck-6c43c.cloudfunctions.net';
+export const HOST = 'https://fetchdeckdev.myshopify.com/admin/api/2020-07';
 
 export const LOGIN = 'LOGIN';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';

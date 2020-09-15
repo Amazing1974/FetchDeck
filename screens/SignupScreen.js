@@ -6,6 +6,7 @@ import {
   Image,
   Text,
   Dimensions,
+  ScrollView
 } from 'react-native';
 import { Form, Spinner } from 'native-base';
 import { reduxForm, Field } from 'redux-form';
@@ -54,6 +55,7 @@ const SignupScreen = (props) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScrollView style={{flex: 1}}>
       <View style={styles.signupContainer}>
         <Image
           source={require('../assets/images/splash.jpeg')}
@@ -62,9 +64,15 @@ const SignupScreen = (props) => {
         <Text style={GlobalStyles.errorMessage}>{props.auth.error}</Text>
         <Form style={GlobalStyles.form}>
           <Field
-            name="fullName"
+            name="firstName"
             component={CustomInput}
-            floatLabel={'Full Name'}
+            floatLabel={'First Name'}
+            autoCorrect={false}
+          />
+          <Field
+            name="lastName"
+            component={CustomInput}
+            floatLabel={'Last Name'}
             autoCorrect={false}
           />
           <Field
@@ -90,6 +98,7 @@ const SignupScreen = (props) => {
           {renderRegisterButton()}
         </Form>
       </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -117,7 +126,7 @@ const styles = {
     alignItems: 'center',
   },
   image: {
-    marginTop: -40,
+    marginTop: 0,
     width: width - 180,
     height: height / 12,
   },

@@ -64,9 +64,9 @@ const ProgressBar = forwardRef((props, ref) => {
         props.onSold();
       }
     }
-  }, !isSold ? 200 : null);
+  }, !isSold ? 150 : null);
 
-  return (    
+  return (
     <Animated.View style={[styles.progress, {width}, progress > 196 ? { borderBottomRightRadius: 4 } : null ]}/>
   )
 });
