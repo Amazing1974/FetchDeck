@@ -2,7 +2,10 @@ import {
   LOGIN,
   LOGIN_ERROR,
   REGISTER_SUCCESS,
-  PROFILE_UPDATE_ON_INIT
+  PROFILE_UPDATE_ON_INIT,
+  ADD_ADDRESS,
+  ADD_ADDRESS_ERROR,
+  ADD_ADDRESS_SUCCESS
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -26,6 +29,22 @@ export default function(state = INITIAL_STATE, action) {
         error: '',
       }
     case LOGIN_ERROR:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+      }
+    case ADD_ADDRESS:
+      return {
+        ...state,
+        isLoading: true,
+      }
+    case ADD_ADDRESS_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+      }
+    case ADD_ADDRESS_ERROR:
       return {
         ...state,
         isLoading: false,

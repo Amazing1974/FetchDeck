@@ -10,6 +10,7 @@ import firestore from '@react-native-firebase/firestore';
 import ProgressBar from '../components/ProgressBar';
 import { Spinner } from 'native-base';
 import { Palette, GlobalStyles } from '../styles';
+import { set } from 'lodash';
 
 const ProductCard = (props) => {
 
@@ -17,6 +18,7 @@ const ProductCard = (props) => {
   const [buyer, setBuyer] = useState('');
   const [isSold, setSold] = useState(false);
   const [product, setProduct] = useState();
+  const [isSoldMe, setSoldByMe] = useState(false);
 
   const progressBarRef = useRef();
   const randomBidders = props.randomBidders;
@@ -38,15 +40,14 @@ const ProductCard = (props) => {
     .onSnapshot(documentSnapshot => {
       const Data = documentSnapshot.data();
       setBuyer(Data.bid.winning_name);
-      setProduct({...product, ...Data});
-      setLoading(false);
+      setProduct({...product, ...Data});;
       !isSold && progressBarRef.current.resetProgressBar();
     })
 
   }
 
   const onBid = async(auto) => {
-    setLoading(true);
+    // setLoading(true);
 
     const current_buyer = onChangeBuyer(auto);
     let updatedBid = product.bid;
@@ -64,8 +65,10 @@ const ProductCard = (props) => {
   
   const onChangeBuyer = (auto) => {
     if(!auto) {
+      setSoldByMe(true);
       return props && props.user.first_name;
     } else {
+      setSoldByMe(false);
       if(randomBidders) {
         let temp = randomBidders;
         temp = temp.sort(() => Math.random() - 0.5); // sort product random
@@ -75,26 +78,19 @@ const ProductCard = (props) => {
   }
 
   const onSold = () => {
-    // console.log('======Sold product by', buyer);
     setSold(true);
     let temp = props.productsUID;
     temp = temp.sort(() => Math.random() - 0.5); // sort product random
-    // console.log(temp[0]);
-
-    const bid = {
-      current_bid: 0,
-      winning_name: '',
-      seller_name: seller_name,
-    }
-    if(buyer.charAt(0).toUpperCase() === props.user.first_name.charAt(0).toUpperCase()) {
-      alert('SOLD');
-    }
-    // fetchProduct(props.uid);
-    // firestore()
-    // .collection('Products')
-    // .doc(props.uid)
-    // .update({ bid: bid })
-    // fetchProduct(temp[0]);
+    
+    // if(isSoldMe) {
+      firestore()
+      .collection('Users')
+      .doc(props.user.uid)
+      .collection('Order')
+      .doc('checkout')
+      .set({price: current_bid, productID: props.uid})
+      props.navigation.navigate('Checkout');
+    // }
   }
 
   return (

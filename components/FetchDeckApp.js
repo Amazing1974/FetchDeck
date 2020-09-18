@@ -12,6 +12,8 @@ import Tutorial from '../screens/Tutorial';
 import ProductDetail from '../screens/ProductDetail';
 import AccountInfo from '../screens/AccountInfo';
 import Reminders from '../screens/Reminders';
+import Checkout from '../screens/Checkout';
+import ShippingAddress from '../screens/ShippingAddress';
 import DrawerContent from './DrawerContent';
 import { Palette } from '../styles';
 
@@ -59,6 +61,8 @@ const FetchDeckApp = (props) => {
           <Stack.Screen name="AccountInfo" component={AccountInfo} />
           <Stack.Screen name="Reminders" component={Reminders} />
           <Stack.Screen name="ProductDetail" component={ProductDetail} />
+          <Stack.Screen name="Checkout" component={Checkout} />
+          <Stack.Screen name="ShippingAddress" component={ShippingAddress} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
