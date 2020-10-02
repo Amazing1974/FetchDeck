@@ -108,6 +108,7 @@ export const fetchProducts = () => async (dispatch) => {
   .collection('Products')
   .get()
   .then(querySnapshot => {
+    console.log(querySnapshot);
     querySnapshot.forEach(snapshot => {
       let temp = snapshot.data()
       temp.uid = snapshot.id;

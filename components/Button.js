@@ -3,11 +3,15 @@ import { TouchableOpacity, Text } from 'react-native';
 import { Palette } from '../styles';
 
 const Button = (props) => {
-  const { title, onPress, style } = props;
+  const { title, onPress, style, disabled } = props;
   const mergedButtonStyle = { ...styles.button, ...style };
 
   return (
-    <TouchableOpacity onPress={onPress} style={mergedButtonStyle}>
+    <TouchableOpacity
+      disabled={disabled}
+      onPress={onPress}
+      style={mergedButtonStyle}
+    >
       <Text style={styles.label}>{title}</Text>
     </TouchableOpacity>
   )
